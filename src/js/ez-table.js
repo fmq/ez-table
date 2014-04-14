@@ -1,3 +1,4 @@
+/*jshint -W043 */
 angular.module('ez.table', [])
 
 .constant('EzTableConfig', {
@@ -110,8 +111,9 @@ angular.module('ez.table', [])
                     
                     scope.pager.setPage = function (pageNum) {
                         console.log(pageNum);
-                        if (pageNum)
+                        if (pageNum) {
                             scope.pager.currentPage = parseInt(pageNum);
+                        }
                         
                         if (scope.pager.maxPages < scope.pager.totalPages) {
                             var startPage = Math.max(scope.pager.currentPage - Math.floor(scope.pager.maxPages/2), 1);                                                           
@@ -136,13 +138,14 @@ angular.module('ez.table', [])
                         }
                         return scope.pager.currentPage;
                         
-                    }
+                    };
                     
                     scope.pager.prev = function () {
-                        if (scope.pager.currentPage > 1)
+                        if (scope.pager.currentPage > 1) {
                             scope.pager.setPage(--scope.pager.currentPage);
+                        }
                         return scope.pager.currentPage;
-                    }
+                    };
                     
                     scope.pager.refresh = function(data) {
                         
@@ -156,12 +159,12 @@ angular.module('ez.table', [])
                         for (startPage; startPage <= endPage ; startPage++) {
                             scope.pager.pages.push(startPage);
                         }
-                    }
+                    };
                     
                     scope.pager.setRowsPerPage = function (rows) {
                         scope.limit = rows;
                         scope.setPage(0);
-                    }
+                    };
                     // END PAGER
                     
                     scope.currentPage = 0;
