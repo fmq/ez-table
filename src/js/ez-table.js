@@ -7,7 +7,7 @@ angular.module('ez.table', [])
     sortField: null,
     sortAscending: false,
     // FMQ - Added global search
-    globalSearchField: null,
+    globalSearchField: undefined,
     // FMQ - Added show batch
     showBatchActions: false,
 })
@@ -102,9 +102,9 @@ angular.module('ez.table', [])
                     // FMQ - Added show batch field
                     scope.showBatchActions = scope.$eval(attrs.showBatchActions) || EzTableConfig.showBatchActions;
                     // FMQ - Added global search field
-                    var globalSearchField = scope.$eval(attrs.searchField) || EzTableConfig.globalSearchField;
-
-                    // FMQ - Pager implementations - TODO -> Move to a directive..
+                    var globalSearchField = scope.$eval(attrs.globalSearch) || EzTableConfig.globalSearchField;
+                    // FMQ - Pager implementations -
+                    // TODO -> Move to a directive..
                     scope.pager = {};
                     scope.pager.currentPage = 1;
                     scope.pager.maxPages = 7;
@@ -267,7 +267,7 @@ angular.module('ez.table', [])
                     }, true);
 
                     // FMQ - Global search wtch
-                    scope.$watch('searchString', function(newVal, oldVal) {
+                    scope.$watch(attrs.globalSearch, function(newVal, oldVal) {
                         if(newVal !== oldVal) {
                              $timeout(function() {
                                  globalSearchField = newVal;
