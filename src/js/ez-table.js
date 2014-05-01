@@ -112,7 +112,7 @@ angular.module('ez.table', [])
 
                     scope.pager.setPage = function (pageNum) {
                         if (pageNum) {
-                            scope.pager.currentPage = parseInt(pageNum);
+                            scope.pager.currentPage = parseInt(pageNum,10);
                         }
 
                         if (scope.pager.maxPages < scope.pager.totalPages) {
@@ -152,7 +152,7 @@ angular.module('ez.table', [])
                         scope.pager.totalRows = data.length;
                         scope.pager.totalPages = Math.ceil(data.length / scope.pager.rowsPerPage);
                         // Inicializo el paginadr
-                        var startPage = parseInt(1);
+                        var startPage = parseInt(1,10);
                         var endPage = scope.pager.totalPages < scope.pager.maxPages ? scope.pager.totalPages : scope.pager.maxPages;
                         scope.pager.pages = [];
 
