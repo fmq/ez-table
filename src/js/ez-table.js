@@ -102,11 +102,7 @@ angular.module('ez.table', [])
                     // FMQ - Added show batch field
                     scope.showBatchActions = scope.$eval(attrs.showBatchActions) || EzTableConfig.showBatchActions;
                     // FMQ - Added global search field
-<<<<<<< HEAD
                     var globalSearchField = scope.$eval(attrs.globalSearch) || EzTableConfig.globalSearchField;
-=======
-                    var globalSearchField = scope.$eval(attrs.globalsearch) || EzTableConfig.globalSearchField;
->>>>>>> e96e67ad45741151b01c8856b50ec1995059e526
                     // FMQ - Pager implementations -
                     // TODO -> Move to a directive..
                     scope.pager = {};
@@ -271,11 +267,7 @@ angular.module('ez.table', [])
                     }, true);
 
                     // FMQ - Global search wtch
-<<<<<<< HEAD
                     scope.$watch(attrs.globalSearch, function(newVal, oldVal) {
-=======
-                    scope.$watch(attrs.globalsearch, function(newVal, oldVal) {
->>>>>>> e96e67ad45741151b01c8856b50ec1995059e526
                         if(newVal !== oldVal) {
                              $timeout(function() {
                                  globalSearchField = newVal;
