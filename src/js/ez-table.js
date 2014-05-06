@@ -162,7 +162,7 @@ angular.module('ez.table', [])
                     };
 
                     scope.pager.setRowsPerPage = function (rows) {
-                        scope.limit = rows;
+                        scope.pager.rowsPerPage = scope.limit = rows;
                         scope.setPage(0);
                     };
                     // END PAGER
