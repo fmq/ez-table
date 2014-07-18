@@ -92,7 +92,7 @@ angular.module('ez.table', [])
                     scope.limit = parseInt(attrs.limit, 10) || EzTableConfig.limit;
                     scope.paginasPorAdelantado = parseInt(attrs.paginasPorAdelantado, 10) || EzTableConfig.paginasPorAdelantado;
                     scope.limits = scope.$eval(attrs.limits) || EzTableConfig.limits;
-                    scope.sortField = scope.$eval(attrs.sortField) || EzTableConfig.sortField;
+                    scope.sortField = attrs.sortField || EzTableConfig.sortField;
                     scope.sortAscending = scope.$eval(attrs.sortAscending) || EzTableConfig.sortAscending;
                     // FMQ - Added show batch field
                     scope.showBatchActions = scope.$eval(attrs.showBatchActions) || EzTableConfig.showBatchActions;
