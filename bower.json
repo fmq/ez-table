@@ -1,7 +1,7 @@
 {
-  "name": "ez-table-fmq",
+  "name": "ez-table-paginator",
   "version": "0.1.5",
-  "main": ["dist/ez-table.min.js", "dist/ez-table.min.css"],
+  "main": ["dist/ez-table-paginator.min.js", "dist/ez-table-paginator.min.css"],
   "ignore": [
     "**/.*",
     "node_modules",

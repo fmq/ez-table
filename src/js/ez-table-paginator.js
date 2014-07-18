@@ -1,5 +1,5 @@
 /*jshint -W043 */
-angular.module('ez.table', [])
+angular.module('ez.table.paginator', [])
 
 .constant('EzTableConfig', {
     limit: 10,
@@ -13,7 +13,7 @@ angular.module('ez.table', [])
     showBatchActions: false,
 })
 
-.directive('ezTable', ['$filter', '$timeout', 'EzTableConfig',
+.directive('ezTablePaginator', ['$filter', '$timeout', 'EzTableConfig',
     function ($filter, $timeout, EzTableConfig) {
         return {
             restrict: 'A',
@@ -189,7 +189,7 @@ angular.module('ez.table', [])
                     scope.calcPages = function (page) {
                         var items = [];
 
-                        items = scope.$eval(attrs.ezTable);
+                        items = scope.$eval(attrs.ezTablePaginator);
 
                         // Si se trata de una actualizacion agrego los items recuperados del REST al arreglo actual en el lugar donde corresponda.
                         if(scope.actualizado)
@@ -287,7 +287,7 @@ angular.module('ez.table', [])
                         }
                     });
 
-                    scope.$watch(attrs.ezTable, function (items) {
+                    scope.$watch(attrs.ezTablePaginator, function (items) {
                         scope.showBatchActions = false;
 
                         if (items) {

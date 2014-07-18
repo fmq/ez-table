@@ -1,7 +1,7 @@
-describe('ez-table', function() {
+describe('ez-table-paginator', function() {
   var el, scope, rows;
 
-  beforeEach(module('ez.table'));
+  beforeEach(module('ez.table.paginator'));
 
   beforeEach(inject(function($rootScope, $compile) {
       scope = $rootScope;
