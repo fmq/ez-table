@@ -40,9 +40,10 @@ angular.module('ez.table.paginator', [])
                     colName = ColName.charAt(0).toLowerCase() + ColName.slice(1);
                     fieldName = angular.element(cols[i]).data('field') || colName;
                     // FMQ -  MOdified for look and feel.
-                    headerTpl += '<th class="sorting" ng-class="{\'sorting_asc\': sortAscending && sortField == \'' + fieldName +
-                                    '\', \'sorting_desc\': !sortAscending && sortField == \'' + fieldName + '\'} " ><a ng-click="sort(\'' + fieldName +
-                                    '\')">' + ColName + '<span ng-show="sortField == \'' + colName + '\'" ></span></a></th>';
+                    
+                    headerTpl += '<th class="sorting" ng-class="{\'sorting_asc\': !sortAscending && sortField == \'' + fieldName +
+                                    '\', \'sorting_desc\': sortAscending && sortField == \'' + fieldName + '\'} " ng-click="sort(\'' + fieldName +
+                                    '\')">' + ColName + '<span ng-show="sortField == \'' + colName + '\'" ></span></th>';
 
                 }
 
