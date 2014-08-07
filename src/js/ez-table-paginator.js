@@ -143,7 +143,7 @@ angular.module('ez.table.paginator', [])
                         return scope.pager.currentPage;
                     };
 
-                    scope.pager.refresh = function(data) {
+                    scope.pager.refresh = function() {
                         scope.pager.totalRows = scope.pages.length * scope.limit;
                         scope.pager.totalPages = Math.ceil(scope.pager.totalRows / scope.pager.rowsPerPage);
                         // Inicializo el paginador
@@ -170,7 +170,7 @@ angular.module('ez.table.paginator', [])
                         scope.currentPage = page;
                         
                         // Cargo mas paginas si la actual esta completa y la proxima esta vacia.
-                        if(scope.currentPage != 0 && scope.pages[scope.currentPage].length == scope.limit && !scope.pages[scope.currentPage + 1])
+                        if(scope.currentPage !== 0 && scope.pages[scope.currentPage].length === scope.limit && !scope.pages[scope.currentPage + 1])
                         {
                             // TODO Hacer esto generico ($parent.$parent)
                             scope.$parent.$parent.searchParams.limiteInferior = ((scope.currentPage) * scope.limit) + 1;
@@ -200,10 +200,11 @@ angular.module('ez.table.paginator', [])
                                 scope.pages[i] = items.slice((i - scope.actualizadoDesde) * scope.limit, (((i - scope.actualizadoDesde) * scope.limit) + scope.limit));
                                 
                                 // Si no hay mas resultados termino el bucle.
-                                if(scope.pages[i].length < scope.limit)
+                                if(scope.pages[i].length < scope.limit) {
                                     break;
+								}
                             }
-                            scope.pager.refresh(items);
+                            scope.pager.refresh();
                             scope.setPage(page);
                             return;
                         }
@@ -212,11 +213,11 @@ angular.module('ez.table.paginator', [])
                         {
                             scope.pageCount = items.length / scope.limit;
                             scope.pages = [];
-                            for (var i = 0; i < scope.pageCount; i++) {
-                                scope.pages[i] = items.slice(i * scope.limit, ((i * scope.limit) + scope.limit));
+                            for (var j = 0; j < scope.pageCount; j++) {
+                                scope.pages[j] = items.slice(j * scope.limit, ((j * scope.limit) + scope.limit));
                             }
                             // FMQ - Refresh tha pager count
-                            scope.pager.refresh(items);
+                            scope.pager.refresh();
                             scope.setPage(page);
                         }
                     };
@@ -246,10 +247,12 @@ angular.module('ez.table.paginator', [])
                         scope.$parent.$parent.searchParams.limiteInferior = 1;
                         scope.$parent.$parent.searchParams.limiteSuperior = scope.limit * scope.pager.maxPages;
                         scope.$parent.$parent.searchParams.ordenarPor = name;
-                        if(scope.sortAscending)
+                        if(scope.sortAscending) {
                             scope.$parent.$parent.searchParams.orden = "asc";
-                        else
+                        }
+                        else {
                             scope.$parent.$parent.searchParams.orden = "desc";
+                        }
                         
                         // Borro las paginas anteriores
                         scope.pages = {};
@@ -311,8 +314,9 @@ angular.module('ez.table.paginator', [])
                     scope.$watch(attrs.globalSearch, function(newVal, oldVal) {
                         if(newVal !== oldVal) {
                             // Si ya esta corriendo el timeout lo cancelo
-                            if(scope.timeOut)
+                            if(scope.timeOut) {
                                 $timeout.cancel(scope.timeOut);
+                            }
                             
                             // Inicio un nuevo timeout
                             scope.timeOut = $timeout(function() {
