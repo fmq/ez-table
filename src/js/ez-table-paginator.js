@@ -144,6 +144,9 @@ angular.module('ez.table.paginator', [])
                     };
 
                     scope.pager.refresh = function() {
+                        if (data.length === 0)
+                            scope.setPage(0);
+
                         scope.pager.totalRows = scope.pages.length * scope.limit;
                         scope.pager.totalPages = Math.ceil(scope.pager.totalRows / scope.pager.rowsPerPage);
                         // Inicializo el paginador
