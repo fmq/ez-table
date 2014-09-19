@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         commit: true,
         commitMessage: 'Release v%VERSION%',
         commitFiles: ['package.json', 'bower.json'],
-        pushTo: 'master',
+        pushTo: 'paginador',
       }
     },
     jshint: {

@@ -3,10 +3,11 @@ angular.module('ez.table.paginator', [])
 
 .constant('EzTableConfig', {
     limit: 10,
-    limits: [5, 10, 25, 100],
-    paginasPorAdelantado: 4,
+    limits: [10, 25, 100],
+    paginasPorAdelantado: 3,
     sortField: null,
     sortAscending: true,
+    reset: 0,
     // FMQ - Added global search
     globalSearchField: undefined,
     // FMQ - Added show batch
@@ -18,7 +19,7 @@ angular.module('ez.table.paginator', [])
         return {
             restrict: 'A',
             scope: true,
-            compile: function (element) {
+            compile: function (element, attrs) {
 
                 // create header template
                 var headerTpl = '<thead><tr>',
@@ -40,9 +41,10 @@ angular.module('ez.table.paginator', [])
                     colName = ColName.charAt(0).toLowerCase() + ColName.slice(1);
                     fieldName = angular.element(cols[i]).data('field') || colName;
                     // FMQ -  MOdified for look and feel.
-                    headerTpl += '<th class="sorting" ng-class="{\'sorting_asc\': sortAscending && sortField == \'' + fieldName +
-                                    '\', \'sorting_desc\': !sortAscending && sortField == \'' + fieldName + '\'} " ><a ng-click="sort(\'' + fieldName +
-                                    '\')">' + ColName + '<span ng-show="sortField == \'' + colName + '\'" ></span></a></th>';
+                    
+                    headerTpl += '<th class="sorting" ng-class="{\'sorting_asc\': !sortAscending && sortField == \'' + fieldName +
+                                    '\', \'sorting_desc\': sortAscending && sortField == \'' + fieldName + '\'} " ng-click="sort(\'' + fieldName +
+                                    '\')">' + ColName + '<span ng-show="sortField == \'' + colName + '\'" ></span></th>';
 
                 }
 
@@ -53,6 +55,9 @@ angular.module('ez.table.paginator', [])
                 var footerTpl = '<tfoot><tr> \
                     <tr> \
                      <td colspan="100%"> \
+                        <span class="batch-actions" ng-show="showBatchActions && dirty">\
+                            <i class="fa fa-hand-o-up"></i> <a id="batchEdit" class="btn btn-sm btn-default" ng-click="executeAction()" title="batchAction">{{accion}}</a>\
+                        </span>\
                         <div class="row" > \
                             <div class="limit-selector col-md-6"> \
                                 <a ng-click="pager.setRowsPerPage(10)" ng-class="{active: limit == 10}" >10</a><span>|</span> \
@@ -92,12 +97,17 @@ angular.module('ez.table.paginator', [])
                     scope.limit = parseInt(attrs.limit, 10) || EzTableConfig.limit;
                     scope.paginasPorAdelantado = parseInt(attrs.paginasPorAdelantado, 10) || EzTableConfig.paginasPorAdelantado;
                     scope.limits = scope.$eval(attrs.limits) || EzTableConfig.limits;
-                    scope.sortField = scope.$eval(attrs.sortField) || EzTableConfig.sortField;
+                    scope.sortField = attrs.sortField || EzTableConfig.sortField;
                     scope.sortAscending = scope.$eval(attrs.sortAscending) || EzTableConfig.sortAscending;
                     // FMQ - Added show batch field
                     scope.showBatchActions = scope.$eval(attrs.showBatchActions) || EzTableConfig.showBatchActions;
                     // FMQ - Added global search field
                     var globalSearchField = scope.$eval(attrs.globalSearch) || EzTableConfig.globalSearchField;
+                    var reset = parseInt(attrs.reset, 10) || EzTableConfig.reset;
+                    
+                    scope.accion = scope.$eval(attrs.batchAction);
+                    scope.batchFn = scope.$eval(attrs.batchFn);
+                    scope.refresh = scope.$eval(attrs.refresh);
                     // FMQ - Pager implementations -
                     // TODO -> Move to a directive..
                     scope.pager = {};
@@ -142,7 +152,10 @@ angular.module('ez.table.paginator', [])
                         return scope.pager.currentPage;
                     };
 
-                    scope.pager.refresh = function(data) {
+                    scope.pager.refresh = function() {
+                        if (data.length === 0)
+                            scope.setPage(0);
+
                         scope.pager.totalRows = scope.pages.length * scope.limit;
                         scope.pager.totalPages = Math.ceil(scope.pager.totalRows / scope.pager.rowsPerPage);
                         // Inicializo el paginador
@@ -162,24 +175,42 @@ angular.module('ez.table.paginator', [])
                     // END PAGER
 
                     scope.currentPage = 0;
-                    scope.batchAction = '';
                     scope.filters = {};
+                    
+                    scope.executeAction = function() {                        
+                        var items = scope.pages[scope.currentPage];
+                        if(items.length === 1) {
+                            scope.batchFn(items[0], scope.$eval(attrs.ezTablePaginator), scope.refresh);
+                        }
+                        else {
+                            var anular = [];
+                            angular.forEach(items, function (item, i) {
+                                if (item._selected) {
+                                    anular.push(item);
+                                }
+                            });
+                            scope.batchFn(anular, scope.$eval(attrs.ezTablePaginator), scope.refresh);
+                        }
+                    };
 
                     scope.setPage = function (page) {
                         scope.currentPage = page;
                         
+                        // Se llego a la ultima de las paginas cargadas, la proxima esta vacia
+                        var finCargadas = scope.currentPage !== 0 && scope.pages[scope.currentPage] && scope.pages[scope.currentPage].length === scope.limit && 
+                            (!scope.pages[scope.currentPage + 1] || scope.pages[scope.currentPage + 1].length === 0);
+                        
                         // Cargo mas paginas si la actual esta completa y la proxima esta vacia.
-                        if(scope.currentPage != 0 && scope.pages[scope.currentPage].length == scope.limit && !scope.pages[scope.currentPage + 1])
-                        {
+                        if(finCargadas) {
                             // TODO Hacer esto generico ($parent.$parent)
-                            scope.$parent.$parent.searchParams.limiteInferior = ((scope.currentPage) * scope.limit) + 1;
-                            scope.$parent.$parent.searchParams.limiteSuperior = (scope.currentPage) * scope.limit + (scope.paginasPorAdelantado * scope.limit);
+                            scope.$parent.$parent.searchParams.limiteInferior = ((scope.currentPage + 1) * scope.limit) + 1;
+                            scope.$parent.$parent.searchParams.limiteSuperior = ((scope.currentPage + 1) * scope.limit) + (scope.paginasPorAdelantado * scope.limit);
                             
                             // Llamo al REST 
                             scope.$parent.$parent.search();
                             
                             scope.actualizado = true;
-                            scope.actualizadoDesde = page;
+                            scope.actualizadoDesde = page + 1;
                         }
                         scope.items = scope.pages[page];
                         // FMQ - Set pager selected page
@@ -190,19 +221,24 @@ angular.module('ez.table.paginator', [])
                         var items = [];
 
                         items = scope.$eval(attrs.ezTablePaginator);
-
+                        
+                        scope.dirty = items.length > 0;
+                        
                         // Si se trata de una actualizacion agrego los items recuperados del REST al arreglo actual en el lugar donde corresponda.
                         if(scope.actualizado)
                         {
                             scope.actualizado = false;
                             for (var i = scope.actualizadoDesde; i < scope.actualizadoDesde + scope.paginasPorAdelantado; i++) {
-                                scope.pages[i] = items.slice((i - scope.actualizadoDesde) * scope.limit, (((i - scope.actualizadoDesde) * scope.limit) + scope.limit));
+                                var paginaActual = items.slice((i - scope.actualizadoDesde) * scope.limit, (((i - scope.actualizadoDesde) * scope.limit) + scope.limit));
+                                if(paginaActual.length > 0)
+                                    scope.pages[i] = paginaActual;
                                 
                                 // Si no hay mas resultados termino el bucle.
-                                if(scope.pages[i].length < scope.limit)
+                                if(scope.pages[i] && scope.pages[i].length < scope.limit) {
                                     break;
+								}
                             }
-                            scope.pager.refresh(items);
+                            scope.pager.refresh();
                             scope.setPage(page);
                             return;
                         }
@@ -211,11 +247,11 @@ angular.module('ez.table.paginator', [])
                         {
                             scope.pageCount = items.length / scope.limit;
                             scope.pages = [];
-                            for (var i = 0; i < scope.pageCount; i++) {
-                                scope.pages[i] = items.slice(i * scope.limit, ((i * scope.limit) + scope.limit));
+                            for (var j = 0; j < scope.pageCount; j++) {
+                                scope.pages[j] = items.slice(j * scope.limit, ((j * scope.limit) + scope.limit));
                             }
                             // FMQ - Refresh tha pager count
-                            scope.pager.refresh(items);
+                            scope.pager.refresh();
                             scope.setPage(page);
                         }
                     };
@@ -245,10 +281,12 @@ angular.module('ez.table.paginator', [])
                         scope.$parent.$parent.searchParams.limiteInferior = 1;
                         scope.$parent.$parent.searchParams.limiteSuperior = scope.limit * scope.pager.maxPages;
                         scope.$parent.$parent.searchParams.ordenarPor = name;
-                        if(scope.sortAscending)
+                        if(!scope.sortAscending) {
                             scope.$parent.$parent.searchParams.orden = "asc";
-                        else
+                        }
+                        else {
                             scope.$parent.$parent.searchParams.orden = "desc";
+                        }
                         
                         // Borro las paginas anteriores
                         scope.pages = {};
@@ -286,10 +324,16 @@ angular.module('ez.table.paginator', [])
                             scope.calcPages(0);
                         }
                     });
+                    
+                    scope.$watch('reset', function (newVal, oldVal) {
+                        if (newVal !== oldVal && newVal !== 0) {
+                            scope.actualizado = false;
+                            scope.pager.currentPage = 1;
+                            scope.pager.maxPages = 7;
+                        }
+                    });
 
                     scope.$watch(attrs.ezTablePaginator, function (items) {
-                        scope.showBatchActions = false;
-
                         if (items) {
                             var count = items.length;
                             angular.forEach(items, function (item, i) {
@@ -310,8 +354,9 @@ angular.module('ez.table.paginator', [])
                     scope.$watch(attrs.globalSearch, function(newVal, oldVal) {
                         if(newVal !== oldVal) {
                             // Si ya esta corriendo el timeout lo cancelo
-                            if(scope.timeOut)
+                            if(scope.timeOut) {
                                 $timeout.cancel(scope.timeOut);
+                            }
                             
                             // Inicio un nuevo timeout
                             scope.timeOut = $timeout(function() {
