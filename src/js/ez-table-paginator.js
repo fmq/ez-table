@@ -153,7 +153,7 @@ angular.module('ez.table.paginator', [])
                     };
 
                     scope.pager.refresh = function() {
-                        if (data.length === 0)
+                        if (data && data.length === 0)
                             scope.setPage(0);
 
                         scope.pager.totalRows = scope.pages.length * scope.limit;
