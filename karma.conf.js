@@ -15,7 +15,7 @@ module.exports = function(config) {
       'bower_components/angular-mocks/angular-mocks.js',
 
       // our app
-      'src/js/ez-table-paginator.js',
+      'src/js/ez-table.js',
 
       // tests
       'spec/*Spec.js',

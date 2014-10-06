@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         commit: true,
         commitMessage: 'Release v%VERSION%',
         commitFiles: ['package.json', 'bower.json'],
-        pushTo: 'paginador',
+        pushTo: 'master',
       }
     },
     jshint: {
@@ -52,7 +52,7 @@ module.exports = function(grunt) {
           yuicompress: true
         },
         files: {
-          "dist/ez-table-paginator.min.css": "src/less/ez-table-paginator.less"
+          "dist/ez-table.min.css": "src/less/ez-table.less"
         }
       }
     },
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/ez-table-paginator.min.js': ['src/js/**/*.js']
+          'dist/ez-table.min.js': ['src/js/**/*.js']
         }
       }
     },
