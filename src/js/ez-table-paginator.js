@@ -33,7 +33,7 @@ angular.module('ez.table.paginator', [])
 
                 for (var i = 1; i < cols.length - 1; i++) {
                     ColName = angular.element(cols[i]).data('title');
-
+                    
                     if (!ColName) {
                         throw new Error('data-title attribute must be specified for column "' + i + '"');
                     }
@@ -316,6 +316,9 @@ angular.module('ez.table.paginator', [])
                             scope.$parent.$parent.searchParams.limiteInferior = 1;
                             scope.$parent.$parent.searchParams.limiteSuperior = scope.limit * scope.pager.maxPages;
 
+                            if(scope.$parent.$parent.searchParams.resultadosPorPagina)
+                                scope.$parent.$parent.searchParams.resultadosPorPagina = scope.limit;
+                                
                             // Borro las paginas anteriores
                             scope.pages = {};
 
