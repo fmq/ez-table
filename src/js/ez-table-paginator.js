@@ -33,7 +33,7 @@ angular.module('ez.table.paginator', [])
 
                 for (var i = 1; i < cols.length - 1; i++) {
                     ColName = angular.element(cols[i]).data('title');
-                    
+
                     if (!ColName) {
                         throw new Error('data-title attribute must be specified for column "' + i + '"');
                     }
@@ -69,6 +69,9 @@ angular.module('ez.table.paginator', [])
                                     <!-- pagination --> \
                                     <ul class="pagination pagination-sm" ng-show="pager.totalPages > 0" > \
                                         <li ng-class="{disabled: pager.currentPage == 1}"> \
+                                            <a ng-click="first()" ><i class="fa fa-chevron-left"></i><i class="fa fa-chevron-left"></i></a> \
+                                        </li> \
+                                        <li ng-class="{disabled: pager.currentPage == 1}"> \
                                             <a ng-click="prev()" ><i class="fa fa-chevron-left"></i></a> \
                                         </li> \
                                         <li ng-repeat="page in pager.pages" class="" ng-class="{active: pager.currentPage === page, inactive: pager.currentPage !== page}"> \
@@ -78,6 +81,9 @@ angular.module('ez.table.paginator', [])
                                         </li> \
                                         <li ng-class="{disabled: pager.currentPage == pager.totalPages}"> \
                                             <a ng-click="next()" ><i class="fa fa-chevron-right"></i></a> \
+                                        </li> \
+                                        <li ng-class="{disabled: pager.currentPage == pager.totalPages}"> \
+                                            <a ng-click="last()" ><i class="fa fa-chevron-right"></i><i class="fa fa-chevron-right"></i></a> \
                                         </li> \
                                     </ul>\
                                 </div> \
@@ -108,6 +114,9 @@ angular.module('ez.table.paginator', [])
                     scope.accion = scope.$eval(attrs.batchAction);
                     scope.batchFn = scope.$eval(attrs.batchFn);
                     scope.refresh = scope.$eval(attrs.refresh);
+
+                    scope.showPage = scope.$eval(attrs.showPage);
+
                     // FMQ - Pager implementations -
                     // TODO -> Move to a directive..
                     scope.pager = {};
@@ -135,6 +144,17 @@ angular.module('ez.table.paginator', [])
                                 scope.pager.pages.push(startPage);
                             }
                         }
+                    };
+
+                    scope.pager.first = function () {
+                        scope.pager.setPage(1);
+                        return scope.pager.currentPage;
+
+                    };
+
+                    scope.pager.last = function () {
+                        scope.pager.setPage(scope.pager.totalPages);
+                        return scope.pager.currentPage;
                     };
 
                     scope.pager.next = function () {
@@ -274,6 +294,18 @@ angular.module('ez.table.paginator', [])
 
                     };
 
+                    scope.first = function () {
+                        scope.items = scope.pages[scope.pager.first() -1 ];
+                        scope.isToggled = false;
+
+                    };
+
+                    scope.last = function () {
+                        scope.setPage(scope.pager.last() -1);
+                        scope.isToggled = false;
+
+                    };
+
                     scope.sort = function (name) {
                         scope.sortAscending = !scope.sortAscending;
                         scope.sortField = name;
@@ -318,7 +350,7 @@ angular.module('ez.table.paginator', [])
 
                             if(scope.$parent.$parent.searchParams.resultadosPorPagina)
                                 scope.$parent.$parent.searchParams.resultadosPorPagina = scope.limit;
-                                
+
                             // Borro las paginas anteriores
                             scope.pages = {};
 
@@ -366,6 +398,23 @@ angular.module('ez.table.paginator', [])
                                  globalSearchField = newVal;
                                  scope.filter();
                             }, 3000);
+                        }
+                    });
+
+                    // FMQ - Navigate to page
+                    scope.$watch(attrs.showPage, function(newVal, oldVal) {
+                        console.log('showPage - old:' + oldVal + ' -- new: ' + newVal);
+                        if(newVal !== oldVal) {
+
+                            // navigate to selected page.
+                            if (newVal == 'first')
+                                scope.first();
+                            else if (newVal == 'last')
+                                scope.last();
+                            else {
+                                scope.setPage(newVal);
+                                scope.isToggled = false;
+                            }
                         }
                     });
                 };
