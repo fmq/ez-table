@@ -216,9 +216,16 @@ angular.module('ez.table.paginator', [])
                     scope.setPage = function (page) {
                         scope.currentPage = page;
 
-                        // Se llego a la ultima de las paginas cargadas, la proxima esta vacia
-                        var finCargadas = scope.currentPage !== 0 && scope.pages[scope.currentPage] && scope.pages[scope.currentPage].length === scope.limit &&
-                            (!scope.pages[scope.currentPage + 1] || scope.pages[scope.currentPage + 1].length === 0);
+			var finCargadas = false;
+                        if ( scope.pages[scope.currentPage + 1] == undefined )
+                        {
+                            finCargadas = false;
+                        } else {
+
+                            // Se llego a la ultima de las paginas cargadas, la proxima esta vacia
+                            finCargadas = scope.currentPage !== 0 && scope.pages[scope.currentPage] && scope.pages[scope.currentPage].length === scope.limit &&
+                                (!scope.pages[scope.currentPage + 1] || scope.pages[scope.currentPage + 1].length === 0);
+                        }
 
                         // Cargo mas paginas si la actual esta completa y la proxima esta vacia.
                         if(finCargadas) {
